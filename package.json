@@ -4,10 +4,11 @@
   "private": true,
   "dependencies": {
     "axios": "^0.16.2",
-    "body-parser": "^1.17.2",
+    "body-parser": "^1.18.1",
     "express": "^4.15.4",
     "foreman": "^2.0.0",
     "marked": "^0.3.6",
+    "material-design-icons": "^3.0.1",
     "material-ui": "^0.19.1",
     "mongoose": "^4.11.10",
     "nodemon": "^1.12.0",

@@ -18,7 +18,10 @@ const style = {
 class Catalog extends Component {
     constructor(props) {
 		super(props);
-		this.state = { catalogData: [] };
+        this.state = { 
+            catalogData: [],
+            pollInterval:0 
+        };
 		this.loadCommentsFromServer = this.loadCommentsFromServer.bind(this);
 	}
 	
@@ -28,12 +31,37 @@ class Catalog extends Component {
 		this.setState({ catalogData: res.data });
     })}
     
+	deleteCommentFromServer( commentID, ItemDetailID, itemID ) {
+		axios.delete(this.props.url, {
+            data:{
+                type:'comment',
+                itemID:itemID, 
+                ItemDetailID: ItemDetailID, 
+                commentID: commentID
+            }
+        });
+    }
+    
+	deleteItemDetailFromServer( ItemDetailID, itemID ) {
+        console.log(itemID, ItemDetailID);
+		axios.delete(this.props.url, {
+            data:{
+                type:'item',
+                itemID:itemID, 
+                ItemDetailID: ItemDetailID
+            }
+        });
+        this.loadCommentsFromServer();
+    }
+    
 	componentDidMount() {
-		this.loadCommentsFromServer();
-		// setInterval(this.loadCommentsFromServer, this.props.pollInterval);
+        this.loadCommentsFromServer();
+        setInterval(this.loadCommentsFromServer, this.state.pollInterval);
+		// 
 	}
     render() {
         if(this.state.catalogData.length === 0) {
+            // this.setState({pollInterval:this.props.pollInterval});
             return (
                 <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
                     <div style={style.container}>
@@ -49,10 +77,13 @@ class Catalog extends Component {
                 </MuiThemeProvider>
             );
         }
+        // this.setState({pollInterval:0});
         // console.log(this.state.catalogData.length);
         const catalogItems=this.state.catalogData.map((item)=>{
             return (
                 <Items 
+                onCommentDelete={(commentID, itemDetailsID, itemID ) => this.deleteCommentFromServer(commentID, itemDetailsID, itemID )}
+                onItemDelete={( itemDetailsID,itemID ) => this.deleteItemDetailFromServer( itemDetailsID, itemID )}
                 key={item.name}
                 catalogItem={item}/>
             );

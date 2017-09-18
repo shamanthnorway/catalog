@@ -16,7 +16,7 @@ injectTapEventPlugin();
 
 const style = {
     height: 10,
-    width: '90%',
+    width: '97%',
     margin: 30,
     textAlign: 'center',
     display: 'inline-block',
@@ -28,6 +28,12 @@ class Items extends Component {
         const itemDescription = this.props.catalogItem.description.map((description) => {
             return (
                 <ItemDetails 
+                onCommentDelete={(commentID, itemDetails_servername ) => this.props.onCommentDelete(commentID, itemDetails_servername, this.props.catalogItem._id)}
+                onItemDelete={( itemDetails_servername ) => {
+                    console.log('Inside: ',itemDetails_servername);
+                    this.props.onItemDelete( itemDetails_servername, this.props.catalogItem._id);
+                    }
+                }
                 key={description.servername} 
                 itemDescription={description}/>
             );
@@ -45,7 +51,7 @@ class Items extends Component {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHeaderColumn>Server Name</TableHeaderColumn>
+                                <TableHeaderColumn>Server Name</TableHeaderColumn>
                                     <TableHeaderColumn>Links or shortcuts</TableHeaderColumn>
                                     <TableHeaderColumn>Comments</TableHeaderColumn>
                                 </TableRow>

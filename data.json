@@ -1,4 +1,4 @@
-[
+
 	{
 		"name":"CA IDM",
 		"description":
@@ -34,7 +34,7 @@
 				]
 			}
 		]
-	},
+	}
 	{
 		"name":"CA IDM 2",
 		"description":
@@ -56,4 +56,3 @@
 			}
 		]
 	}
-]
