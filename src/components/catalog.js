@@ -42,6 +42,18 @@ class Catalog extends Component {
         });
     }
     
+	editCommentFromServer( newComment, username, oldComment, ItemDetailID, itemID ) {
+        // console.log( commentID, ItemDetailID, itemID );
+		axios.post(this.props.url, {
+            type:'comment',
+            itemID:itemID, 
+            ItemDetailID: ItemDetailID, 
+            newComment: newComment, 
+            username: username, 
+            oldComment: oldComment            
+        });
+    }
+    
 	deleteItemDetailFromServer( ItemDetailID, itemID ) {
         console.log(itemID, ItemDetailID);
 		axios.delete(this.props.url, {
@@ -54,10 +66,32 @@ class Catalog extends Component {
         this.loadCommentsFromServer();
     }
     
+	editItemDetailFromServer( newServername, newLink, oldServername, itemID ) {
+        console.log(newServername, newLink, oldServername, itemID);
+		axios.post(this.props.url, {
+            type:'item',
+            itemID: itemID, 
+            newServername: newServername, 
+            newLink: newLink, 
+            oldServername: oldServername
+        });
+        this.loadCommentsFromServer();
+    }
+    
+	addItemDetailFromServer( newServername, newLink, itemID ) {
+        console.log(newServername, newLink, itemID);
+		axios.post(this.props.url, {
+            type:'addItem',
+            itemID: itemID, 
+            newServername: newServername, 
+            newLink: newLink
+        });
+        this.loadCommentsFromServer();
+    }
+    
 	componentDidMount() {
         this.loadCommentsFromServer();
-        setInterval(this.loadCommentsFromServer, this.state.pollInterval);
-		// 
+        // setInterval(this.loadCommentsFromServer, this.state.pollInterval);
 	}
     render() {
         if(this.state.catalogData.length === 0) {
@@ -81,9 +115,14 @@ class Catalog extends Component {
         // console.log(this.state.catalogData.length);
         const catalogItems=this.state.catalogData.map((item)=>{
             return (
-                <Items 
+                <Items
+                onItemAdd={(newServername, newLink, itemID) => {
+                    console.log(itemID);
+                    this.addItemDetailFromServer( newServername, newLink, itemID );}}
                 onCommentDelete={(commentID, itemDetailsID, itemID ) => this.deleteCommentFromServer(commentID, itemDetailsID, itemID )}
+                onCommentEdit={(newComment, username, oldComment, itemDetailsID, itemID ) => this.editCommentFromServer(newComment, username, oldComment, itemDetailsID, itemID )}
                 onItemDelete={( itemDetailsID,itemID ) => this.deleteItemDetailFromServer( itemDetailsID, itemID )}
+                onItemEdit={( newServername, newLink, oldServername,itemID ) => this.editItemDetailFromServer( newServername, newLink, oldServername, itemID )}
                 key={item.name}
                 catalogItem={item}/>
             );

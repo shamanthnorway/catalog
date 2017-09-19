@@ -3,7 +3,6 @@ var bodyParser = require('body-parser');
 var Links = require('./../model/links');
 var bodyParser = require('body-parser');
 var linkRouter = express.Router();
-var mongoose = require('mongoose');
 linkRouter.use(bodyParser.json());
 
 linkRouter.route('/')
@@ -14,7 +13,7 @@ linkRouter.route('/')
     });
 })
 .delete(function (req, res, next) {
-    var ObjectId = mongoose.Schema.Types.ObjectId;
+    // var ObjectId = mongoose.Schema.Types.ObjectId;
     // console.log('Request: ',req.body);
     if(req.body.type === 'comment') {
         // console.log('itemID: ',req.body.itemID);
@@ -45,22 +44,56 @@ linkRouter.route('/')
 })
 
 .post(function (req, res, next) {
-    var ObjectId = mongoose.Schema.Types.ObjectId;
-    console.log('Request: ',req.body);
+    console.log('post msg: ',req.body );
     if(req.body.type === 'comment') {
-        Links.findOneAndUpdate({_id:req.body.commentID, "description":{$elemMatch: { _id:req.body.ItemDetailID }}},
-        { $push:{ "description.$.comments":{_id:req.body.itemID} }}, 
+        console.log('@ post itemID: ',req.body.itemID);
+        Links.findOneAndUpdate({_id:req.body.itemID, "description":{$elemMatch: { "servername":req.body.ItemDetailID }}},
+        { $pull:{ "description.$.comments":{"comment":req.body.oldComment} }}, 
         { safe: true },
+        function(err, res){
+            if(err) {
+                console.log('err: ',err);
+            }
+        });
+        Links.findOneAndUpdate({_id:req.body.itemID, "description":{$elemMatch: { "servername":req.body.ItemDetailID }}},
+        { $push:{ "description.$.comments":{"username":req.body.username, "comment":req.body.newComment, } }}, 
+        { safe: true },
+        function(err, res){
+            if(err) {
+                console.log('err: ',err);
+            }
+        });
+    }
+    else if( req.body.type === 'item') {
+        // console.log('Item to be deleted');
+        Links.findOneAndUpdate(
+            {
+                _id: req.body.itemID, 
+                "description":{
+                    $elemMatch: {
+                        "servername":req.body.oldServername
+                    }
+                }
+            },
+            { $set:{ "description.$.servername":req.body.newServername, "description.$.link":req.body.newLink }}, 
+            { safe: true },
         function(err, res){
             if(err) {
                 console.log(err);
             }
-            else 
-                console.log(res);
         });
     }
-    else if( req.body.type === 'item' ) {
-        console.log('Item to be deleted');
+    else if( req.body.type === 'addItem') {
+        console.log('add new item');
+        Links.findOneAndUpdate(
+            { _id: req.body.itemID },
+            { $push:{ "description":{ "servername":req.body.newServername, "link":req.body.newLink }}}, 
+            { safe: true },
+        function(err, res){
+            if(err) {
+                console.log(err);
+            } else console.log(res);
+        });
     }
 })
 
